@@ -5,3 +5,5 @@ bdcn_model/*
 Pretrained_Models/*
 !Pretrained_Models/.gitkeep
 *.png
+docker/homedir/*
+!docker/homedir/.gitkeep
