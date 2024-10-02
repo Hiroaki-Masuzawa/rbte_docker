@@ -34,5 +34,5 @@ cd docker
 ./run.sh
 ```
 ```
-python3 script/edge_detection_test.py 
+python3 script/edge_detection_test.py --input /userdir/iamges/color/Lenna.bmp
 ```
