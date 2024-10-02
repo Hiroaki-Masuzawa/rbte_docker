@@ -1,0 +1,6 @@
+[submodule "hed"]
+	path = hed
+	url = https://github.com/sniklaus/pytorch-hed.git
+[submodule "BDCN"]
+	path = BDCN
+	url = https://github.com/Hiroaki-Masuzawa/BDCN.git

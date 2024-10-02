@@ -1,0 +1,1 @@
+mkdir se_model && cd se_model && wget https://github.com/opencv/opencv_extra/raw/5e3a56880fb115e757855f8e01e744c154791144/testdata/cv/ximgproc/model.yml.gz && gunzip model.yml.gz 

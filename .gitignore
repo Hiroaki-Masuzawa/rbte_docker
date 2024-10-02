@@ -1,0 +1,5 @@
+images
+se_model
+bdcn_model/*
+!bdcn_model/.gitkeep
+result.png
