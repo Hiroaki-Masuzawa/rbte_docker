@@ -22,7 +22,7 @@ bdcn_modelについては[ここ](https://drive.google.com/file/d/1CmDMypSlLM6EA
 cd docker
 ./build.sh
 ```
-
+# 実行
 ## exec sample
 ```
 cd docker
