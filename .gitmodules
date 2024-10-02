@@ -4,3 +4,6 @@
 [submodule "hed"]
 	path = hed
 	url = https://github.com/sniklaus/pytorch-hed.git
+[submodule "im2rbte"]
+	path = im2rbte
+	url = https://github.com/NikosEfth/im2rbte.git
