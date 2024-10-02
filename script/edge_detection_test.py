@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 import numpy as np
 
@@ -12,6 +13,10 @@ import bdcn
 
 sys.path.append('/userdir/hed')
 from run import Network
+
+
+sys.path.append('/userdir/im2rbte')
+from augmentations import EdgeDetector, OriNMS, Thresholder, Cleaner
 
 
 def detect_SE_edge(image):
@@ -47,9 +52,20 @@ def detect_hed_edge(model, image):
     tenOutput = model(tenInput.view(1, 3, intHeight, intWidth))[0, :, :, :]
     tenOutput = torchvision.transforms.functional.resize(img=tenOutput, size=(raw_height, raw_width))
     return tenOutput.clip(0.0, 1.0).numpy().transpose(1, 2, 0)[:, :, 0]
+
+
 if __name__ == '__main__':
-    image_bgr = cv2.imread('/userdir/images/color/Lenna.bmp')
-    
+    parser = argparse.ArgumentParser(
+        prog='',  # プログラム名
+        usage='',  # プログラムの利用方法
+        add_help=True,  # -h/–help オプションの追加
+    )
+    parser.add_argument('--input', type=str, default="/userdir/images/color/Lenna.bmp")
+    parser.add_argument('--output', type=str, default="output.png")
+    parser.add_argument('--debug_image', type=str, default="result.png")
+    args = parser.parse_args()
+
+    image_bgr = cv2.imread(args.input)
     
     bdcn_model = bdcn.BDCN()
     bdcn_model.load_state_dict(torch.load('/userdir/bdcn_model/final-model/bdcn_pretrained_on_bsds500.pth'))
@@ -64,5 +80,26 @@ if __name__ == '__main__':
     se_result_v = cv2.cvtColor((se_result*255).astype(np.uint8),cv2.COLOR_GRAY2BGR)
     bdcn_result_v = cv2.cvtColor((bdcn_result*255).astype(np.uint8),cv2.COLOR_GRAY2BGR)
     hed_result_v = cv2.cvtColor((hed_result*255).astype(np.uint8),cv2.COLOR_GRAY2BGR)
-    show_img = cv2.hconcat([image_bgr, se_result_v, bdcn_result_v, hed_result_v])
-    cv2.imwrite('result.png', show_img)
+    show_img = cv2.hconcat([image_bgr, bdcn_result_v, hed_result_v, se_result_v])
+    output = (np.stack([bdcn_result, hed_result, se_result]).transpose(1,2,0)*255).astype(np.uint8)
+    cv2.imwrite(args.debug_image, show_img)
+    cv2.imwrite(args.output, output)
+
+    edge_d = EdgeDetector(edge_mode='normal')
+    nms_model = cv2.ximgproc.createStructuredEdgeDetection('/userdir/Pretrained_Models/opencv_extra.yml.gz')
+    nms = OriNMS(model=nms_model, prob=100, radious=2, bound_radious=0, multi=1.0)
+    thresholder = Thresholder(thresh_rand=20, thresh_mode='normal', hyst_par=(0.5, 1.5), hyst_pert=0.2, hyst_prob=100, thinning=False)
+    cleaner = Cleaner(percent_of_cc=(100, 100), del_less_than=(10, 10))
+
+    samples = []
+    for _ in range(3):
+        work1 = edge_d(output)
+        work2 = nms(work1)
+        work3 = thresholder(work2)
+        work4 = cleaner(work3)
+        work = np.concatenate([work1, work2, work3, work4], axis=1)
+        work = cv2.hconcat([output, (work*255).astype(np.uint8)])
+        samples.append(work)
+    sample = cv2.vconcat(samples)
+    cv2.imwrite("work.png", sample)
+
