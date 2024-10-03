@@ -14,7 +14,7 @@ git clone --recurcive https://github.com/Hiroaki-Masuzawa/rbte_docker.git
 ## 各モデルweightのダウンロード
 - SEは以下コマンドでダウンロードする
     ```
-    ./donwload_se_model.sh
+    ./download_se_model.sh
     ```
 - bdcn_modelについては[ここ](https://drive.google.com/file/d/1CmDMypSlLM6EAvOt5yjwUQ7O5w-xCm1n/view?usp=sharing)からダウンロードしてbdcn_modelフォルダ内に置く．
 - nms用のモデルは以下コマンドでダウンロードする．
