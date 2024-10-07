@@ -36,7 +36,8 @@ def detect_BDCN_edge(model, image, device):
     data = torch.Tensor(data[np.newaxis,:,:,:].transpose(0,3,1,2)).to(device)
     with torch.no_grad():
         out = model(data)
-    fuse = F.sigmoid(out[-1]).cpu().data.numpy()[0, 0, :, :]
+    # fuse = F.sigmoid(out[-1]).cpu().data.numpy()[0, 0, :, :]
+    fuse = torch.sigmoid(out[-1]).cpu().data.numpy()[0, 0, :, :]
     return fuse
 
 def detect_hed_edge(model, image, device):
@@ -173,15 +174,26 @@ if __name__ == '__main__':
         nms = OriNMS(model=nms_model, prob=100, radious=2, bound_radious=0, multi=1.0)
         thresholder = Thresholder(thresh_rand=20, thresh_mode='normal', hyst_par=(0.5, 1.5), hyst_pert=0.2, hyst_prob=100, thinning=False)
         cleaner = Cleaner(percent_of_cc=(100, 100), del_less_than=(10, 10))
-
+        tr_list = [edge_d, nms, thresholder, cleaner]
+        trans = torchvision.transforms.Compose(tr_list)
         samples = []
         for _ in range(3):
-            work1 = edge_d(output)
-            work2 = nms(work1)
-            work3 = thresholder(work2)
-            work4 = cleaner(work3)
-            work = np.concatenate([work1, work2, work3, work4], axis=1)
-            work = cv2.hconcat([output, (work*255).astype(np.uint8)])
+            if True:
+                start_time = time.time()
+                work1 = edge_d(output)
+                work2 = nms(work1)
+                work3 = thresholder(work2)
+                work4 = cleaner(work3)
+                end_time = time.time()
+                print(end_time-start_time)
+                work = np.concatenate([work1, work2, work3, work4], axis=1)
+                work = cv2.hconcat([output, (work*255).astype(np.uint8)])
+            else :
+                start_time = time.time()
+                work = trans(output)
+                end_time = time.time()
+                print(end_time-start_time)
+                work = cv2.hconcat([output, (work*255).astype(np.uint8)])
             samples.append(work)
         sample = cv2.vconcat(samples)
         cv2.imwrite("work.png", sample)
