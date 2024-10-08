@@ -10,13 +10,17 @@ import bdcn
 sys.path.append('/userdir/hed')
 from hed_network import Network
 
-
-def detect_SE_edge(image):
-    imgrgb = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)/255
-    imgrgb = imgrgb.astype(np.float32)
+def get_SE_model():
     model = '/userdir/se_model/model.yml'
     retval = cv2.ximgproc.createStructuredEdgeDetection(model)
-    out = retval.detectEdges(imgrgb)
+    return retval
+
+def detect_SE_edge(model, image):
+    imgrgb = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)/255
+    imgrgb = imgrgb.astype(np.float32)
+    # model = '/userdir/se_model/model.yml'
+    # retval = cv2.ximgproc.createStructuredEdgeDetection(model)
+    out = model.detectEdges(imgrgb)
     return out
 
 def get_BDCN_model():

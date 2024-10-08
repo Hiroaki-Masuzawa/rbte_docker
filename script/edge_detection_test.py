@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(__file__))
 
-from edge_detection import detect_SE_edge, detect_BDCN_edge, detect_hed_edge, get_BDCN_model, get_hed_model
+from edge_detection import detect_SE_edge, detect_BDCN_edge, detect_hed_edge, get_SE_model, get_BDCN_model, get_hed_model
 
 sys.path.append('/userdir/im2rbte')
 from augmentations import EdgeDetector, OriNMS, Thresholder, Cleaner
@@ -37,6 +37,8 @@ if __name__ == '__main__':
 
     image_bgr = cv2.imread(args.input)
     
+    se_model = get_SE_model()
+
     bdcn_model = get_BDCN_model()
     bdcn_model.to(device).eval()
 
@@ -64,7 +66,7 @@ if __name__ == '__main__':
 
         for _ in range(100):
             start_time = time.time()
-            se_result = detect_SE_edge(image_bgr)
+            se_result = detect_SE_edge(se_model, image_bgr)
             se_end = time.time()
             bdcn_result = detect_BDCN_edge(bdcn_model, image_bgr, device)
             bdcn_end = time.time()
