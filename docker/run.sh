@@ -6,9 +6,12 @@ else
     DATASET_MOUNT_COMMAND=""
 fi
 
+set -x
+
 docker run -it --rm \
 -u `id -u`:`id -g` \
 --gpus all \
+--net=host \
 --shm-size=8g \
 --env DISPLAY=$DISPLAY \
 --env PYTHONDONTWRITEBYTECODE=1 \
@@ -19,4 +22,5 @@ docker run -it --rm \
 -v $SCRIPT_DIR/homedir:/home/`whoami`/ \
 $DATASET_MOUNT_COMMAND \
 -w /userdir \
+--name im2rbte \
 im2rbte bash
