@@ -100,5 +100,5 @@ if __name__ ==  '__main__':
         mask = grad_cam(test_input) 
         mask_uint8 = (mask*255).astype(np.uint8)
         heatmap = cv2.applyColorMap(mask_uint8, cv2.COLORMAP_JET)
-        result_img = test_img//2+heatmap//2
+        result_img = cv2.hconcat([test_img, heatmap, test_img//2+heatmap//2])
         cv2.imwrite("cam_{}.png".format(os.path.basename(testfile)), result_img)
