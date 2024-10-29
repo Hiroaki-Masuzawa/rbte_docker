@@ -93,11 +93,12 @@ if __name__ ==  '__main__':
         test_img = cv2.imread(testfile)
         if np.mean(test_img) > 128:
             test_img = 255-test_img
-        test_input = torch.Tensor(np.transpose(cv2.resize(test_img, (args.inputsize, args.inputsize))/255, (2,0,1))[np.newaxis]).to(device)
+        test_img = cv2.resize(test_img, (args.inputsize, args.inputsize))
+        test_input = torch.Tensor(np.transpose(test_img/255, (2,0,1))[np.newaxis]).to(device)
         print(testfile, model(test_input).detach().cpu().softmax(dim=1).numpy())    
 
         mask = grad_cam(test_input) 
         mask_uint8 = (mask*255).astype(np.uint8)
         heatmap = cv2.applyColorMap(mask_uint8, cv2.COLORMAP_JET)
-        result_img = cv2.resize(cv2.imread(testfile), (args.inputsize, args.inputsize))//2+heatmap//2
+        result_img = test_img//2+heatmap//2
         cv2.imwrite("cam_{}.png".format(os.path.basename(testfile)), result_img)
