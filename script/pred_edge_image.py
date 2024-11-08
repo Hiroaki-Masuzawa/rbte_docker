@@ -43,12 +43,15 @@ class GradCam:
         return result
 
     # Function to compute the Grad-CAM heatmap
-    def __call__(self, inputs):
+    def __call__(self, inputs, target_index=None):
         self.model.zero_grad()  # Zero the gradients
         output = self.model(inputs)  # Forward pass
 
         # Get the index of the highest score in the output
-        index = np.argmax(output.cpu().data.numpy())
+        if target_index is None:
+            index = np.argmax(output.cpu().data.numpy())
+        else:
+            index = target_index
         target = output[0][index]  # Get the target score
         target.backward()  # Backward pass to compute gradients
 
